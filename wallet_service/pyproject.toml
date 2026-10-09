@@ -3,7 +3,6 @@ name = "wallet-service"
 version = "0.1.0"
 description = "LedgerLite wallet service: USD balances, provider deposits, idempotent transfers and credit purchases."
 authors = ["Danylo Roshchenko"]
-readme = "../README.md"
 package-mode = false
 
 [tool.poetry.dependencies]

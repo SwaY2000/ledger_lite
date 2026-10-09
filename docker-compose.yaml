@@ -1,0 +1,59 @@
+x-base: &base-app
+  env_file:
+    - path: .env.example
+    - path: .env
+      required: false
+  networks:
+    - app_network
+
+services:
+  postgres:
+    <<: *base-app
+    image: postgres:16-alpine
+    container_name: ledgerlite-postgres
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  provider-mock:
+    <<: *base-app
+    build:
+      context: ./provider_mock
+      dockerfile: Dockerfile
+    image: ledgerlite-provider-mock
+    container_name: ledgerlite-provider-mock
+    hostname: provider-mock
+    command: uvicorn src.asgi:build_app --factory --host 0.0.0.0 --port 80
+    ports:
+      - "${PROVIDER_HOST_PORT:-8081}:80"
+
+  wallet-service:
+    <<: *base-app
+    build:
+      context: ./wallet_service
+      dockerfile: Dockerfile
+    image: ledgerlite-wallet-service
+    container_name: ledgerlite-wallet-service
+    hostname: wallet-service
+    command: sh -c "alembic upgrade head && uvicorn src.asgi:build_app --factory --host 0.0.0.0 --port 80"
+    ports:
+      - "${WALLET_HOST_PORT:-8080}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      provider-mock:
+        condition: service_started
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  postgres:
+    driver: local

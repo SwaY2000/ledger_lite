@@ -3,7 +3,6 @@ name = "provider-mock"
 version = "0.1.0"
 description = "LedgerLite payment provider mock: in-memory invoices with signed webhooks."
 authors = ["Danylo Roshchenko"]
-readme = "../README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
