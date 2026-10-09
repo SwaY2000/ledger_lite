@@ -42,7 +42,7 @@ class SqlAlchemyDepositRepository:
         model = await self._session.scalar(
             select(DepositModel)
             .where(DepositModel.invoice_id == invoice_id)
-            .with_for_update()
+            .with_for_update(key_share=True)
             .execution_options(populate_existing=True),
         )
         return self._mapper.to_entity(model) if model else None

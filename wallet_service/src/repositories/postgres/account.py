@@ -45,12 +45,17 @@ class SqlAlchemyAccountRepository:
         return self._mapper.to_entity(model) if model else None
 
     async def lock_many(self, account_ids: list[str]) -> dict[str, AccountEntity]:
-        """Lock accounts with ``SELECT ... FOR UPDATE`` in ascending id order."""
+        """Lock accounts with ``SELECT ... FOR NO KEY UPDATE`` in ascending id order.
+
+        ``FOR NO KEY UPDATE`` (not ``FOR UPDATE``) is used because inserting rows that reference
+        the account (ledger, idempotency keys) takes ``FOR KEY SHARE`` locks; upgrading those to
+        ``FOR UPDATE`` deadlocks concurrent transfers, while ``NO KEY UPDATE`` does not conflict.
+        """
         result = await self._session.scalars(
             select(AccountModel)
             .where(AccountModel.id.in_(sorted(set(account_ids))))
             .order_by(AccountModel.id)
-            .with_for_update()
+            .with_for_update(key_share=True)
             .execution_options(populate_existing=True),
         )
         return {model.id: self._mapper.to_entity(model) for model in result}
