@@ -118,6 +118,7 @@ line-ending = "auto"
 
 [tool.mypy]
 python_version = "3.12"
+plugins = ["pydantic.mypy"]
 files = ["src/**/*.py"]
 exclude = ["__pycache__", ".mypy_cache", ".venv", "proto"]
 strict = true
