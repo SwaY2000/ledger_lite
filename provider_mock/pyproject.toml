@@ -1,0 +1,156 @@
+[tool.poetry]
+name = "provider-mock"
+version = "0.1.0"
+description = "LedgerLite payment provider mock: in-memory invoices with signed webhooks."
+authors = ["Danylo Roshchenko"]
+readme = "../README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.120.4"
+uvicorn = "^0.24.0"
+pydantic = "^2.12.3"
+pydantic-settings = "^2.11.0"
+dependency-injector = "^4.48.2"
+httpx = "^0.28.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+pytest-asyncio = "^1.4.0"
+ruff = "^0.15.4"
+mypy = "^1.8.0"
+pre-commit = "^4.5.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "__init__.py",
+    "*/tests/*",
+]
+
+line-length = 120
+indent-width = 4
+
+target-version = "py312"
+
+[tool.ruff.lint]
+ignore = ["E501", "E721", "A003", "B904", "B008", "C901"]
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+select = [
+    "A",
+    "B",
+    "C",
+    "E",
+    "F",
+    "I",
+    "W",
+    "UP",
+    "ASYNC",
+    "COM",
+    "T10",
+    "ISC",
+    "ICN",
+    "PIE",
+    "RSE102",
+    "SLOT",
+    "PLC0414",
+    "PLC0414",
+]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+
+[tool.ruff.lint.isort]
+combine-as-imports = false
+force-single-line = false
+force-sort-within-sections = false
+force-wrap-aliases = true
+known-local-folder = []
+known-third-party = []
+lines-after-imports = 2
+lines-between-types = 1
+order-by-type = true
+relative-imports-order = "furthest-to-closest"
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+split-on-trailing-comma = false
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src/**/*.py"]
+exclude = ["__pycache__", ".mypy_cache", ".venv", "proto"]
+strict = true
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = false
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = false
+show_error_codes = true
+disable_error_code = ["misc", "type-arg", "no-any-return"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "dependency_injector.*",
+]
+ignore_missing_imports = true
+
+# Allow subclassing from Any for dependency-injector containers
+[[tool.mypy.overrides]]
+module = "src.containers.*"
+disable_error_code = ["misc"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
