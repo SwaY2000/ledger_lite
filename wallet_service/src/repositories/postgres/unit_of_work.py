@@ -23,7 +23,14 @@ from src.infrastructure.postgres.models import (
     TransactionModel,
     WebhookEventModel,
 )
-from src.repositories.interfaces import IMapper
+from src.repositories.interfaces import (
+    IAccountRepository,
+    IDepositRepository,
+    IIdempotencyRepository,
+    IMapper,
+    ITransactionRepository,
+    IWebhookEventRepository,
+)
 
 from .account import SqlAlchemyAccountRepository
 from .deposit import SqlAlchemyDepositRepository
@@ -43,11 +50,11 @@ class SqlAlchemyUnitOfWork:
     fresh session.
     """
 
-    accounts: SqlAlchemyAccountRepository
-    deposits: SqlAlchemyDepositRepository
-    transactions: SqlAlchemyTransactionRepository
-    idempotency: SqlAlchemyIdempotencyRepository
-    webhook_events: SqlAlchemyWebhookEventRepository
+    accounts: IAccountRepository
+    deposits: IDepositRepository
+    transactions: ITransactionRepository
+    idempotency: IIdempotencyRepository
+    webhook_events: IWebhookEventRepository
 
     def __init__(
         self,
