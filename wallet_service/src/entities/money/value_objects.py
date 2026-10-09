@@ -94,7 +94,7 @@ def calculate_net_deposit(paid_amount: Decimal) -> Decimal:
     return paid - calculate_provider_fee(paid)
 
 
-def calculate_credits_price(credits: int) -> Decimal:
+def calculate_credits_price(quantity: int) -> Decimal:
     """Calculate the USD price of a credits package.
 
     Base price is 0.10 USD per credit; 5% discount from 500 credits and
@@ -102,7 +102,7 @@ def calculate_credits_price(credits: int) -> Decimal:
     with ROUND_HALF_UP.
 
     Args:
-        credits: Number of credits to purchase (must be positive)
+        quantity: Number of credits to purchase (must be positive)
 
     Returns:
         Final price in USD
@@ -113,11 +113,11 @@ def calculate_credits_price(credits: int) -> Decimal:
     Examples:
         333 -> 33.30, 507 -> 48.17, 1005 -> 87.94
     """
-    if credits <= 0:
-        raise ValueError('Credits must be a positive integer')
+    if quantity <= 0:
+        raise ValueError('Credits quantity must be a positive integer')
 
-    discount = next((rate for threshold, rate in CREDIT_DISCOUNT_TIERS if credits >= threshold), Decimal('0'))
-    return quantize_cents(Decimal(credits) * CREDIT_BASE_PRICE * (Decimal('1') - discount))
+    discount = next((rate for threshold, rate in CREDIT_DISCOUNT_TIERS if quantity >= threshold), Decimal('0'))
+    return quantize_cents(Decimal(quantity) * CREDIT_BASE_PRICE * (Decimal('1') - discount))
 
 
 def parse_money(value: object, *, allow_zero: bool = False) -> Decimal:

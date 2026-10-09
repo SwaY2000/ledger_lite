@@ -33,12 +33,12 @@ class DepositEntity(BaseEntity):
 
     account_id: str = Field(..., description='Account to be credited')
     amount: Decimal = Field(..., description='Requested deposit amount')
-    status: DepositStatuses = Field(DepositStatuses.PENDING, description='Current deposit status')
-    invoice_id: str | None = Field(None, description='Provider invoice identifier')
-    pay_url: str | None = Field(None, description='Provider payment page URL')
-    paid_amount: Decimal | None = Field(None, description='Amount actually paid at the provider')
-    fee: Decimal | None = Field(None, description='Provider fee')
-    credited_amount: Decimal | None = Field(None, description='Amount credited to the balance')
+    status: DepositStatuses = Field(default=DepositStatuses.PENDING, description='Current deposit status')
+    invoice_id: str | None = Field(default=None, description='Provider invoice identifier')
+    pay_url: str | None = Field(default=None, description='Provider payment page URL')
+    paid_amount: Decimal | None = Field(default=None, description='Amount actually paid at the provider')
+    fee: Decimal | None = Field(default=None, description='Provider fee')
+    credited_amount: Decimal | None = Field(default=None, description='Amount credited to the balance')
 
     @property
     def is_final(self) -> bool:

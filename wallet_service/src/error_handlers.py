@@ -16,7 +16,7 @@ from typing import Any
 from fastapi import Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .errors import BaseError
@@ -139,7 +139,7 @@ async def unhandled_error_handler(_: Request, exc: Exception) -> JSONResponse:
     return error_response(500, 'internal_error', 'Internal server error')
 
 
-ERROR_HANDLERS: dict[Any, Callable[[Request, Any], Coroutine[Any, Any, JSONResponse]]] = {
+ERROR_HANDLERS: dict[int | type[Exception], Callable[[Request, Any], Coroutine[Any, Any, Response]]] = {
     BaseError: base_error_handler,
     RequestValidationError: validation_error_handler,
     StarletteHTTPException: http_exception_handler,

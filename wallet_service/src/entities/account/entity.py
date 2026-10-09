@@ -31,8 +31,8 @@ class AccountEntity(BaseEntity):
 
     name: str = Field(..., description='Human-readable account name')
     api_key_hash: str = Field(..., description='SHA-256 hash of the API key')
-    balance_usd: Decimal = Field(Decimal('0.00'), description='USD balance with cent precision')
-    credits: int = Field(0, description='Credits balance')
+    balance_usd: Decimal = Field(default=Decimal('0.00'), description='USD balance with cent precision')
+    credits: int = Field(default=0, description='Credits balance')
 
     def credit(self, amount: Decimal) -> None:
         """Add money to the USD balance.
@@ -62,11 +62,11 @@ class AccountEntity(BaseEntity):
         self.balance_usd = quantize_cents(self.balance_usd - amount)
         self.touch()
 
-    def add_credits(self, credits: int) -> None:
+    def add_credits(self, quantity: int) -> None:
         """Add purchased credits to the credits balance.
 
         Args:
-            credits: Positive number of credits
+            quantity: Positive number of credits
         """
-        self.credits += credits
+        self.credits += quantity
         self.touch()

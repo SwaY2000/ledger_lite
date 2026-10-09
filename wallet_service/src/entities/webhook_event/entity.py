@@ -30,5 +30,5 @@ class WebhookEventEntity(BaseEntity):
     event_id: str = Field(..., description='Provider event identifier')
     invoice_id: str = Field(..., description='Provider invoice identifier')
     status: str = Field(..., description='Invoice status reported by the event')
-    paid_amount: Decimal | None = Field(None, description='Paid amount reported by the event')
-    occurred_at: datetime.datetime | None = Field(None, description='Time the event occurred at the provider')
+    paid_amount: Decimal | None = Field(default=None, description='Paid amount reported by the event')
+    occurred_at: datetime.datetime | None = Field(default=None, description='Time the event occurred at the provider')

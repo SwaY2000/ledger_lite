@@ -28,8 +28,8 @@ class IdempotencyRecordEntity(BaseEntity):
     account_id: str = Field(..., description='Account that issued the request')
     key: str = Field(..., description='Idempotency-Key header value')
     request_hash: str = Field(..., description='SHA-256 of the canonical request body')
-    response_status: int | None = Field(None, description='HTTP status of the stored response')
-    response_body: dict[str, Any] | None = Field(None, description='JSON body of the stored response')
+    response_status: int | None = Field(default=None, description='HTTP status of the stored response')
+    response_body: dict[str, Any] | None = Field(default=None, description='JSON body of the stored response')
 
     def store_response(self, status: int, body: dict[str, Any]) -> None:
         """Remember the response to replay it on retries.

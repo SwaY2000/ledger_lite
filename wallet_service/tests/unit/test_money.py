@@ -31,7 +31,7 @@ def test_provider_fee_table(paid: str, fee: str, credited: str) -> None:
 
 
 @pytest.mark.parametrize(
-    ('credits', 'price'),
+    ('quantity', 'price'),
     [
         (333, '33.30'),
         (507, '48.17'),
@@ -43,14 +43,14 @@ def test_provider_fee_table(paid: str, fee: str, credited: str) -> None:
         (1000, '87.50'),
     ],
 )
-def test_credits_price_table(credits: int, price: str) -> None:
-    assert calculate_credits_price(credits) == Decimal(price)
+def test_credits_price_table(quantity: int, price: str) -> None:
+    assert calculate_credits_price(quantity) == Decimal(price)
 
 
-@pytest.mark.parametrize('credits', [0, -1])
-def test_credits_price_rejects_non_positive(credits: int) -> None:
+@pytest.mark.parametrize('quantity', [0, -1])
+def test_credits_price_rejects_non_positive(quantity: int) -> None:
     with pytest.raises(ValueError):
-        calculate_credits_price(credits)
+        calculate_credits_price(quantity)
 
 
 @pytest.mark.parametrize(
