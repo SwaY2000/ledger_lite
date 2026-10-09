@@ -2,7 +2,8 @@
 
 import datetime
 
-from sqlalchemy import select, tuple_
+from sqlalchemy import DateTime, literal, select, tuple_
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.entities.transaction import TransactionEntity
@@ -41,7 +42,11 @@ class SqlAlchemyTransactionRepository:
         """List account transactions, newest first, using keyset pagination."""
         query = select(TransactionModel).where(TransactionModel.account_id == account_id)
         if before is not None:
-            query = query.where(tuple_(TransactionModel.created_at, TransactionModel.id) < tuple_(*before))
+            created_at, transaction_id = before
+            query = query.where(
+                tuple_(TransactionModel.created_at, TransactionModel.id)
+                < tuple_(literal(created_at, DateTime(timezone=True)), literal(transaction_id, UUID(as_uuid=False))),
+            )
 
         result = await self._session.scalars(
             query.order_by(TransactionModel.created_at.desc(), TransactionModel.id.desc()).limit(limit),
