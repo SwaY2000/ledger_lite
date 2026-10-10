@@ -1,0 +1,80 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    name: ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [ wallet_service, provider_mock ]
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ledgerlite
+          POSTGRES_PASSWORD: ledgerlite
+          POSTGRES_DB: ledgerlite
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ledgerlite"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.service }}
+
+    env:
+      TEST_DATABASE_URL: postgresql+asyncpg://ledgerlite:ledgerlite@localhost:5432/ledgerlite_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Poetry
+        run: pipx install poetry==2.2.1
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Ruff lint
+        run: poetry run ruff check .
+
+      - name: Ruff format
+        run: poetry run ruff format --check .
+
+      - name: Mypy
+        run: poetry run mypy
+
+      - name: Apply migrations
+        if: matrix.service == 'wallet_service'
+        env:
+          DATABASE_URL: postgresql+asyncpg://ledgerlite:ledgerlite@localhost:5432/ledgerlite
+        run: poetry run alembic upgrade head && poetry run alembic check
+
+      - name: Tests
+        run: poetry run pytest -v
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build images
+        run: docker compose build
