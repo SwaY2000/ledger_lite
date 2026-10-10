@@ -58,11 +58,12 @@ def main() -> None:
 
         async def command(container: Any) -> Any:
             config = container.config
+            older_than_minutes = args.older_than_minutes
+            if older_than_minutes is None:
+                older_than_minutes = config.reconcile_older_than_minutes()
+            limit = args.limit if args.limit is not None else config.reconcile_batch_size()
             return await container.reconcile_deposits_use_case()(
-                ReconcileDepositsInput(
-                    older_than_minutes=args.older_than_minutes or config.reconcile_older_than_minutes(),
-                    limit=args.limit or config.reconcile_batch_size(),
-                ),
+                ReconcileDepositsInput(older_than_minutes=older_than_minutes, limit=limit),
             )
 
     asyncio.run(_run(command))
